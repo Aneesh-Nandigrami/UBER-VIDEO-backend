@@ -1,9 +1,11 @@
+
 const dotenv = require('dotenv');
 dotenv.config();
 
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
 const app = express();
 
@@ -40,6 +42,9 @@ app.use(express.urlencoded({ extended: true }));
 // Cookie Parser
 app.use(cookieParser());
 
+// STATIC PUBLIC FOLDER (FOR FAVICON)
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Static Upload Folder
 app.use('/uploads', express.static('uploads'));
 
@@ -73,3 +78,4 @@ app.use((req, res) => {
 // EXPORT APP
 // ======================
 module.exports = app;
+
