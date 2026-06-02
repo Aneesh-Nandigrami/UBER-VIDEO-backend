@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 
 const app = require("./app");
 
-// MongoDB connection
 let isConnected = false;
 
 async function connectDB() {
@@ -22,5 +21,12 @@ async function connectDB() {
 
 connectDB();
 
-// IMPORTANT FOR VERCEL
+if (process.env.NODE_ENV !== "production") {
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
 module.exports = app;

@@ -1,6 +1,3 @@
-require("dotenv").config();
+const app = require("../server");
 
-const app = require("../app");
-
-// IMPORTANT FOR VERCEL
 module.exports = app;
