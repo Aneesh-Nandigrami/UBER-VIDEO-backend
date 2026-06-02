@@ -1,40 +1,26 @@
 require("dotenv").config();
-const http = require("http");
 const mongoose = require("mongoose");
 
 const app = require("./app");
-const { initializeSocket } = require("./socket");
-
-const port = process.env.PORT || 4000;
-
-// Create HTTP server
-const server = http.createServer(app);
-
-// Socket setup
-initializeSocket(server);
 
 // MongoDB connection
 let isConnected = false;
 
-async function connectToDatabase() {
+async function connectDB() {
     if (isConnected) return;
 
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await mongoose.connect(process.env.DB_CONNECT);
+
         isConnected = true;
-        console.log("✅ Connected to MongoDB");
+
+        console.log("✅ MongoDB Connected");
     } catch (error) {
-        console.error("❌ Error connecting to MongoDB:", error);
+        console.error("❌ MongoDB Error:", error);
     }
 }
 
-// Call DB connection
-connectToDatabase();
+connectDB();
 
-// Start server
-server.listen(port, () => {
-    console.log(`🚀 Server running on port ${port}`);
-});
-
-// Export app for Vercel / testing
+// IMPORTANT FOR VERCEL
 module.exports = app;
