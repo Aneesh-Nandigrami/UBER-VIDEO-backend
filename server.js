@@ -1,32 +1,55 @@
 require("dotenv").config();
-const mongoose = require("mongoose");
 
+const mongoose = require("mongoose");
 const app = require("./app");
 
 let isConnected = false;
 
 async function connectDB() {
-    if (isConnected) return;
+  if (isConnected) {
+    return;
+  }
 
-    try {
-        await mongoose.connect(process.env.DB_CONNECT);
+  try {
+    const db = await mongoose.connect(
+      process.env.DB_CONNECT,
+      {
+        serverSelectionTimeoutMS: 30000,
+      }
+    );
 
-        isConnected = true;
+    isConnected = db.connections[0].readyState === 1;
 
-        console.log("✅ MongoDB Connected");
-    } catch (error) {
-        console.error("❌ MongoDB Error:", error);
-    }
+    console.log("✅ MongoDB Connected");
+  } catch (error) {
+    console.error("❌ MongoDB Error:", error);
+    throw error;
+  }
 }
 
-connectDB();
+// IMPORTANT FOR VERCEL
+module.exports = async (req, res) => {
+  try {
+    await connectDB();
+    return app(req, res);
+  } catch (error) {
+    console.error("Server Error:", error);
 
-if (process.env.NODE_ENV !== "production") {
-    const PORT = process.env.PORT || 5000;
-
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+    return res.status(500).json({
+      success: false,
+      message: "Database connection failed",
+      error: error.message,
     });
-}
+  }
+};
 
-module.exports = app;
+// LOCAL DEVELOPMENT ONLY
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  });
+}
