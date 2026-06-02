@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const sendOTPEmail =
-    require("../services/mail.service");
+    require("../Services/mail.service");
 
 const generateOTP =
     require("../utils/generateOTP");
