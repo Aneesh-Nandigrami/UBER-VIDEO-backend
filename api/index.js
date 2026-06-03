@@ -4,10 +4,15 @@ const app = require("../app");
 
 let isConnected = false;
 
+// DB CONNECTION (SAFE FOR VERCEL)
 async function connectDB() {
   if (isConnected) return;
 
-  await mongoose.connect(process.env.DB_CONNECT, {
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI missing in environment variables");
+  }
+
+  await mongoose.connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 30000,
   });
 
@@ -15,14 +20,17 @@ async function connectDB() {
   console.log("✅ MongoDB Connected");
 }
 
+// Vercel Serverless Export
 module.exports = async (req, res) => {
   try {
     await connectDB();
     return app(req, res);
   } catch (err) {
+    console.error("❌ Server Error:", err.message);
+
     return res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Server Error",
       error: err.message,
     });
   }
