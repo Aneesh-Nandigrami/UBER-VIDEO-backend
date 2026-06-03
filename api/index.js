@@ -8,11 +8,11 @@ let isConnected = false;
 async function connectDB() {
   if (isConnected) return;
 
-  if (!process.env.MONGO_URI) {
-    throw new Error("MONGO_URI missing in environment variables");
+  if (!process.env.DB_CONNECT) {
+    throw new Error("DB_CONNECT missing in environment variables");
   }
 
-  await mongoose.connect(process.env.MONGO_URI, {
+  await mongoose.connect(process.env.DB_CONNECT, {
     serverSelectionTimeoutMS: 30000,
   });
 

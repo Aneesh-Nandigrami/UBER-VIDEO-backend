@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
 
 // LOCAL DEVELOPMENT ONLY
 if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 5000;
+  const PORT = process.env.PORT || 4000;
 
   connectDB().then(() => {
     app.listen(PORT, () => {
