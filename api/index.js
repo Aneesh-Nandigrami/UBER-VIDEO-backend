@@ -4,26 +4,41 @@ const mongoose = require("mongoose");
 const serverless = require("serverless-http");
 const app = require("../app");
 
-let isConnected = false;
+let cached = global.mongoose;
 
-async function connectDB() {
-  if (isConnected) return;
-
-  await mongoose.connect(process.env.DB_CONNECT);
-
-  isConnected = true;
-  console.log("✅ MongoDB Connected");
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
+async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.DB_CONNECT, {
+      serverSelectionTimeoutMS: 10000,
+    });
+  }
+
+  cached.conn = await cached.promise;
+
+  console.log("✅ MongoDB Connected");
+
+  return cached.conn;
+}
+
+// connect DB before every request
 app.use(async (req, res, next) => {
   try {
     await connectDB();
     next();
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
+    console.error("❌ DB ERROR:", error.message);
+
+    return res.status(500).json({
       success: false,
-      message: "Database connection failed",
+      message: error.message,
     });
   }
 });
