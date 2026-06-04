@@ -1,65 +1,32 @@
-const dotenv = require("dotenv");
-dotenv.config();
-
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const path = require("path");
 
 const app = express();
 
-// ======================
-// MIDDLEWARES
-// ======================
-
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      process.env.FRONTEND_URL
-    ],
-    credentials: true,
-  })
-);
+// Middlewares
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    process.env.VITE_BASE_URL
+  ],
+  credentials: true
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static("uploads"));
+// Routes
+app.use("/users", require("./routes/user.routes"));
+app.use("/captains", require("./routes/captain.routes"));
+app.use("/maps", require("./routes/maps.routes"));
+app.use("/rides", require("./routes/ride.routes"));
+app.use("/api/auth", require("./routes/auth.routes"));
 
-// ======================
-// ROUTES
-// ======================
-
-const userRoutes = require("./routes/user.routes");
-const captainRoutes = require("./routes/captain.routes");
-const mapsRoutes = require("./routes/maps.routes");
-const rideRoutes = require("./routes/ride.routes");
-const authRoutes = require("./routes/auth.routes");
-
-// HOME
+// Test route
 app.get("/", (req, res) => {
-  res.status(200).send("🚀 API Running Successfully");
-});
-
-// API ROUTES
-app.use("/users", userRoutes);
-app.use("/captains", captainRoutes);
-app.use("/maps", mapsRoutes);
-app.use("/rides", rideRoutes);
-app.use("/api/auth", authRoutes);
-
-// ======================
-// 404 HANDLER
-// ======================
-
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
+  res.send("🚀 API Running Successfully");
 });
 
 module.exports = app;

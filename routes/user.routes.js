@@ -17,7 +17,7 @@ const upload =
 // =========================
 // REGISTER USER
 // =========================
-router.post(
+router.get(
 
     '/register',
 
