@@ -1,26 +1,16 @@
 const express = require('express');
-
 const router = express.Router();
-
 const { body } = require("express-validator");
 
-const userController =
-    require('../controllers/user.controller');
-
-const authMiddleware =
-    require("../middlewares/auth.middleware");
-
-const upload =
-    require("../middlewares/uploadCaptainPhoto");
-
+const userController = require('../controllers/user.controller');
+const authMiddleware = require("../middlewares/auth.middleware");
+const upload = require("../middlewares/uploadCaptainPhoto");
 
 // =========================
 // REGISTER USER
 // =========================
-router.get(
-
+router.post(
     '/register',
-
     [
         body('email')
             .isEmail()
@@ -38,18 +28,14 @@ router.get(
                 'Password must be at least 6 characters long'
             )
     ],
-
     userController.registerUser
 );
-
 
 // =========================
 // LOGIN USER
 // =========================
 router.post(
-
     '/login',
-
     [
         body('email')
             .isEmail()
@@ -61,50 +47,35 @@ router.post(
                 "Password must be at least 6 characters long"
             )
     ],
-
     userController.loginUser
 );
-
 
 // =========================
 // USER PROFILE
 // =========================
 router.get(
-
     '/profile',
-
     authMiddleware.authUser,
-
     userController.getUserProfile
 );
-
 
 // =========================
 // LOGOUT USER
 // =========================
 router.get(
-
     '/logout',
-
     authMiddleware.authUser,
-
     userController.logoutUser
 );
-
 
 // =========================
 // UPLOAD PROFILE IMAGE
 // =========================
 router.post(
-
     '/upload-profile',
-
     authMiddleware.authUser,
-
     upload.single('image'),
-
     userController.uploadProfileImage
 );
-
 
 module.exports = router;

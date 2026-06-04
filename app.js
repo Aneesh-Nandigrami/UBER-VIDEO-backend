@@ -4,29 +4,47 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-// Middlewares
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    process.env.VITE_BASE_URL
-  ],
-  credentials: true
-}));
+// =========================
+// MIDDLEWARES
+// =========================
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Routes
+// =========================
+// ROUTES
+// =========================
 app.use("/users", require("./routes/user.routes"));
 app.use("/captains", require("./routes/captain.routes"));
 app.use("/maps", require("./routes/maps.routes"));
 app.use("/rides", require("./routes/ride.routes"));
 app.use("/api/auth", require("./routes/auth.routes"));
 
-// Test route
+// =========================
+// HOME ROUTE
+// =========================
 app.get("/", (req, res) => {
-  res.send("🚀 API Running Successfully");
+  res.status(200).json({
+    success: true,
+    message: "🚀 API Running Successfully",
+  });
+});
+
+// =========================
+// 404 ROUTE
+// =========================
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
 });
 
 module.exports = app;

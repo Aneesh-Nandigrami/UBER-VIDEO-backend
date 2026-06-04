@@ -1,11 +1,11 @@
 require("dotenv").config();
+
 const mongoose = require("mongoose");
 const serverless = require("serverless-http");
 const app = require("../app");
 
 let isConnected = false;
 
-// MongoDB connection
 async function connectDB() {
   if (isConnected) return;
 
@@ -15,11 +15,17 @@ async function connectDB() {
   console.log("✅ MongoDB Connected");
 }
 
-// Attach DB middleware
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Database connection failed",
+    });
+  }
 });
 
-// Export for Vercel
 module.exports = serverless(app);
